@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29503.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestExpandoObject", "TestExpandoObject\TestExpandoObject.csproj", "{54F7FE2F-B208-499E-A51F-1212B96B5A6A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestExpandoObjectTests", "TestExpandoObjectTests\TestExpandoObjectTests.csproj", "{A642AB87-EF41-4898-8E64-4C903BB75C33}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{54F7FE2F-B208-499E-A51F-1212B96B5A6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54F7FE2F-B208-499E-A51F-1212B96B5A6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54F7FE2F-B208-499E-A51F-1212B96B5A6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54F7FE2F-B208-499E-A51F-1212B96B5A6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A642AB87-EF41-4898-8E64-4C903BB75C33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A642AB87-EF41-4898-8E64-4C903BB75C33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A642AB87-EF41-4898-8E64-4C903BB75C33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A642AB87-EF41-4898-8E64-4C903BB75C33}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C6E6E6B-9228-46EE-9C61-7602C2F0DAE7}
+	EndGlobalSection
+EndGlobal
