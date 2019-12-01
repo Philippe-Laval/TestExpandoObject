@@ -5,6 +5,10 @@ using Xunit;
 
 // https://dotnetcademy.net/Learn/4/Pages/1
 
+// FieldInfo Class
+// https://docs.microsoft.com/en-us/dotnet/api/system.reflection.fieldinfo?view=netcore-3.0
+
+
 namespace TestExpandoObjectTests
 {
     public class UnitTest1
