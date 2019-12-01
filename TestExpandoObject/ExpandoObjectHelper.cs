@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Dynamic;
 using System.Text;
 
@@ -33,6 +34,32 @@ namespace TestExpandoObject
             else
                 expandoDict.Add(eventName, handler);
         }
+
+        public static ExpandoObject ToExpandoObject(this object obj)
+        {
+            // https://sebnilsson.com/blog/convert-c-anonymous-or-any-types-into-dynamic-expandoobject/
+
+            // Null-check
+
+            IDictionary<string, object> expando = new ExpandoObject();
+
+            foreach (PropertyDescriptor property in TypeDescriptor.GetProperties(obj.GetType()))
+            {
+                expando.Add(property.Name, property.GetValue(obj));
+            }
+
+            return (ExpandoObject)expando;
+        }
+
+        /*
+         string strCust = JsonConvert.SerializeObject(cust, new ExpandoObjectConverter());
+
+To convert that string back to your original ExpandoObject, you'll use code like this:
+
+cust = JsonConvert.DeserializeObject<ExpandoObject>(res, new ExpandoObjectConverter());
+
+         */
+
 
     }
 }

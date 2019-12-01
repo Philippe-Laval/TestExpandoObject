@@ -1,12 +1,19 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Dynamic;
 using System.Text;
 using TestExpandoObject;
 using Xunit;
+using Xunit.Abstractions;
 
 // https://www.oreilly.com/learning/building-c-objects-dynamically
+// Working with the Dynamic Type in C#
+// https://www.red-gate.com/simple-talk/dotnet/c-programming/working-with-the-dynamic-type-in-c/
+
+// ExpandoObject Class
+// https://docs.microsoft.com/en-us/dotnet/api/system.dynamic.expandoobject?view=netframework-4.8
 
 /*
 ExpandoObject allows you to write code that is more readable than typical reflection code with GetProperty(“Field”) syntax. 
@@ -19,6 +26,13 @@ namespace TestExpandoObjectTests
 {
     public class ExpandoObjectTest
     {
+        private readonly ITestOutputHelper output;
+
+        public ExpandoObjectTest(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
+
         [Fact]
         public void AddPropertiesToExpandoObjectTest()
         {
@@ -166,6 +180,201 @@ namespace TestExpandoObjectTests
             Assert.Equal("Brian", expando.Name);
             Assert.Equal("Spain", expando.Country);
             Assert.Equal("Spanish", expando.Language);
+        }
+
+
+        [Fact]
+        public void ClassHierarchyTest()
+        {
+            output.WriteLine("ExpandoObject inherits from System.Object: " +
+                typeof(ExpandoObject).IsSubclassOf(typeof(Object)));
+
+            output.WriteLine("DynamicObject inherits from System.Object: " +
+                typeof(DynamicObject).IsSubclassOf(typeof(Object)));
+
+            Assert.True(typeof(ExpandoObject).IsSubclassOf(typeof(Object)));
+            Assert.True(typeof(DynamicObject).IsSubclassOf(typeof(Object)));
+
+        }
+
+        [Fact]
+        public void DeserializeJsonToExpandoObjectTest()
+        {
+            string jsonString = "{\"a\":1}";
+            dynamic exObj = JsonConvert.DeserializeObject<ExpandoObject>(jsonString) as dynamic;
+
+            output.WriteLine($"exObj.a = {exObj?.a}, type of {exObj?.a.GetType()}");
+
+            Assert.NotNull(exObj);
+            Assert.Equal(1, exObj.a);
+        }
+
+        [Fact]
+        public void SerializeExpandoObjectToJsonTest()
+        {
+            dynamic expando = new ExpandoObject();
+            expando.Name = "Brian";
+            expando.Country = "USA";
+            expando.Skill = new ExpandoObject();
+            expando.Skill.Description = "Computer Science";
+            expando.Skill.Level = "Great";
+
+            string jsonString = JsonConvert.SerializeObject(expando);
+
+            output.WriteLine($"{jsonString}");
+
+            Assert.NotNull(jsonString);
+        }
+
+        [Fact]
+        public void IDictionaryTest()
+        {
+            string jsonString = "{\"a\":1}";
+            dynamic exObj = JsonConvert.DeserializeObject<ExpandoObject>(jsonString) as dynamic;
+
+            IDictionary<string, object> dict = exObj as IDictionary<string, object> ?? new Dictionary<string, object>();
+            foreach (var exObjProp in dict)
+            {
+                output.WriteLine($"IDictionary = {exObjProp.Key}: {exObjProp.Value}");
+            }
+
+            // Be carefull, we get a long integer. So 1L
+            Assert.Equal(1L, dict["a"]);
+        }
+
+        [Fact]
+        public void ToExpandoObjectTest()
+        {
+            var anonymous = new { Id = 123, Text = "Abc123", Test = true };
+
+            dynamic dynamicObject = anonymous.ToExpandoObject();
+            Assert.Equal(123, dynamicObject.Id);
+            Assert.Equal("Abc123", dynamicObject.Text);
+            Assert.Equal(true, dynamicObject.Test);
+
+
+            ExpandoObject expandoObject = anonymous.ToExpandoObject();
+
+            IDictionary<string, object> dict = expandoObject as IDictionary<string, object>;
+            Assert.Equal(123, dict["Id"]);
+            Assert.Equal("Abc123", dict["Text"]);
+            Assert.Equal(true, dict["Test"]);
+        }
+
+
+        [Fact]
+        public void AddingNewMembers()
+        {
+            dynamic sampleObject = new ExpandoObject();
+            sampleObject.test = "Dynamic Property";
+            output.WriteLine(sampleObject.test);
+            output.WriteLine(sampleObject.test.GetType());
+        }
+
+        [Fact]
+        public void AddingMethod()
+        {
+            dynamic sampleObject = new ExpandoObject();
+            sampleObject.number = 10;
+            sampleObject.Increment = (Action)(() => { sampleObject.number++; });
+
+            // Before calling the Increment method.
+            output.WriteLine(sampleObject.number);
+
+            sampleObject.Increment();
+
+            // After calling the Increment method.
+            output.WriteLine(sampleObject.number);
+            // This code example produces the following output:
+            // 10
+            // 11
+        }
+
+        [Fact]
+        public void AddEvent()
+        {
+            dynamic sampleObject = new ExpandoObject();
+
+            // Create a new event and initialize it with null.  
+            sampleObject.sampleEvent = null;
+
+            // Add an event handler.  
+            sampleObject.sampleEvent += new EventHandler(SampleHandler);
+
+            // Raise an event for testing purposes.  
+            sampleObject.sampleEvent(sampleObject, new EventArgs());
+        }
+
+        // Event handler.  
+        void SampleHandler(object sender, EventArgs e)
+        {
+            output.WriteLine("SampleHandler for {0} event", sender);
+        }
+
+        [Fact]
+        public void PassingAsParameter()
+        {
+            dynamic employee, manager;
+
+            employee = new ExpandoObject();
+            employee.Name = "John Smith";
+            employee.Age = 33;
+
+            manager = new ExpandoObject();
+            manager.Name = "Allison Brown";
+            manager.Age = 42;
+            manager.TeamSize = 10;
+
+            WritePerson(manager);
+            WritePerson(employee);
+        }
+
+        private void WritePerson(dynamic person)
+        {
+            output.WriteLine("{0} is {1} years old.",
+                              person.Name, person.Age);
+            // The following statement causes an exception
+            // if you pass the employee object.
+            // Console.WriteLine("Manages {0} people", person.TeamSize);
+
+        }
+
+        [Fact]
+        public void EnumeratingAndDeletingMembers()
+        {
+            dynamic employee = new ExpandoObject();
+            employee.Name = "John Smith";
+            employee.Age = 33;
+
+            foreach (var property in (IDictionary<String, Object>)employee)
+            {
+                output.WriteLine(property.Key + ": " + property.Value);
+            }
+            // This code example produces the following output:
+            // Name: John Smith
+            // Age: 33
+
+            dynamic employee2 = new ExpandoObject();
+            employee2.Name = "John Smith";
+            employee2.Age = 33;
+            ((IDictionary<String, Object>)employee2).Remove("Name");
+
+        }
+
+
+        [Fact]
+        public void ReceivingNotificationsOfPropertyChanges()
+        {
+            dynamic employee = new ExpandoObject();
+            ((INotifyPropertyChanged)employee).PropertyChanged +=
+                new PropertyChangedEventHandler(HandlePropertyChanges);
+            employee.Name = "John Smith";
+        }
+
+        private void HandlePropertyChanges(
+            object sender, PropertyChangedEventArgs e)
+        {
+            output.WriteLine("{0} has changed.", e.PropertyName);
         }
 
     }
